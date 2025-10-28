@@ -1,0 +1,11 @@
+/* Layout.css - Layout component styles */
+.layout-root {
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+/* Main Content - Full width without sidebar */
+.main-content {
+  width: 100%;
+  min-height: 100vh;
+}

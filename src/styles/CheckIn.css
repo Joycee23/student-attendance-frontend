@@ -1,0 +1,217 @@
+/* CheckIn.css - Check-in page styles */
+.checkin-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.checkin-title {
+  margin: 0 0 24px 0;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.87);
+  text-align: center;
+}
+
+.checkin-paper {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.session-input-section {
+  margin-bottom: 24px;
+}
+
+.session-input-section .form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.session-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+  background-color: #fafafa;
+}
+
+.session-input:focus {
+  outline: none;
+  border-color: #1976d2;
+  background-color: white;
+}
+
+/* Tabs */
+.checkin-tabs {
+  display: flex;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.tab-btn:hover {
+  color: #1976d2;
+  background-color: #f5f5f5;
+}
+
+.tab-btn.active {
+  color: #1976d2;
+  border-bottom-color: #1976d2;
+  background-color: #e3f2fd;
+}
+
+.tab-icon {
+  font-size: 16px;
+}
+
+/* Check-in Content */
+.checkin-content {
+  margin-top: 24px;
+}
+
+.checkin-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+.checkin-card h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+/* Face Check-in */
+.face-checkin-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.webcam-container {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.webcam {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* QR Check-in */
+.qr-checkin-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.instruction-text {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* GPS Check-in */
+.gps-checkin-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.gps-icon {
+  font-size: 4rem;
+  color: #1976d2;
+}
+
+/* Check-in Button */
+.checkin-btn {
+  padding: 12px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  min-width: 200px;
+}
+
+/* Recent Activity */
+.recent-activity {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recent-activity h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.no-activity {
+  color: rgba(0, 0, 0, 0.6);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .checkin-container {
+    padding: 16px;
+  }
+
+  .checkin-title {
+    font-size: 2rem;
+  }
+
+  .checkin-paper {
+    padding: 16px;
+  }
+
+  .checkin-tabs {
+    flex-direction: column;
+  }
+
+  .tab-btn {
+    justify-content: flex-start;
+  }
+
+  .webcam-container {
+    max-width: 100%;
+  }
+
+  .checkin-btn {
+    width: 100%;
+    min-width: unset;
+  }
+}

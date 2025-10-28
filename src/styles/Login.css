@@ -1,0 +1,259 @@
+/* Login Page Styles */
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* Left Section - Image */
+.login-image-section {
+  display: none;
+  position: relative;
+  width: 50%;
+  background: linear-gradient(rgba(2, 2, 2, 0.7), rgba(0, 0, 0, 0.7)),
+    url("https://tenten.vn/tin-tuc/wp-content/uploads/2022/08/Lam-dep-code.jpg")
+      center center;
+  background-size: cover;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.image-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  padding: 2rem;
+  max-width: 400px;
+}
+
+.image-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  font-family: sans-serif;
+}
+
+.image-subtitle {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+}
+
+.image-button-container {
+  display: flex;
+  justify-content: center;
+}
+
+.image-button {
+  background: white;
+  color: #4f46e5;
+  padding: 0.75rem 1.5rem;
+  border-radius: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.5s ease;
+  display: inline-block;
+}
+
+.image-button:hover {
+  background: #4f46e5;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Right Section - Form */
+.login-form-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  padding: 2rem 0;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 32rem;
+  padding: 0 2rem 0 2rem;
+}
+
+.login-form {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding: 2rem;
+}
+
+.form-title {
+  color: #1f2937;
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.form-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 2rem;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 2px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.input-with-icon:focus-within {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.input-icon-svg {
+  height: 1.25rem;
+  width: 1.25rem;
+  color: #9ca3af;
+  flex-shrink: 0;
+  margin-right: 0.75rem;
+}
+
+.form-input {
+  flex: 1;
+  outline: none;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: #374151;
+  padding: 0;
+  width: 100%;
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Login Button */
+.login-button {
+  width: 100%;
+  background: #4f46e5;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.login-button:hover:not(:disabled) {
+  background: #4338ca;
+  transform: translateY(-2px);
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Form Footer */
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.forgot-link {
+  color: #6b7280;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.forgot-link:hover {
+  color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.register-link {
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.5s ease;
+}
+
+.register-link:hover {
+  color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+/* Alerts */
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+/* Responsive Design */
+@media (min-width: 1024px) {
+  .login-image-section {
+    display: flex;
+  }
+
+  .login-form-section {
+    width: 50%;
+  }
+
+  .login-form-container {
+    padding: 0 1.5rem 0 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .login-form {
+    padding: 1.5rem;
+  }
+
+  .image-title {
+    font-size: 2rem;
+  }
+
+  .form-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

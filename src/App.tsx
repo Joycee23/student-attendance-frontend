@@ -5,72 +5,28 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Layout from "./components/Layout";
 import Login from "./pages/Login";
-import Admin from "./pages/Admin";
-import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/Admin";
+import StudentDashboard from "./pages/Dashboard";
+import LecturerDashboard from "./pages/LecturerDashboard";
 import CheckIn from "./pages/CheckIn";
-
-// Theme configuration
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#1976d2",
-    },
-    secondary: {
-      main: "#dc004e",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h4: {
-      fontWeight: 600,
-    },
-    h5: {
-      fontWeight: 500,
-    },
-    h6: {
-      fontWeight: 500,
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: "none",
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-        },
-      },
-    },
-  },
-});
+import "./App.css";
 
 // Protected Route component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 };
 
 // Admin Route component
-const AdminRoute = ({ children }) => {
+const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, loading, user } = useAuth();
 
   if (loading) {
@@ -81,7 +37,7 @@ const AdminRoute = ({ children }) => {
     return <Navigate to="/login" />;
   }
 
-  return user?.role === "admin" ? children : <Navigate to="/dashboard" />;
+  return user?.role === "admin" ? <>{children}</> : <Navigate to="/dashboard" />;
 };
 
 // App Routes component
@@ -108,7 +64,7 @@ const AppRoutes = () => {
         path="/admin"
         element={
           <AdminRoute>
-            <Admin />
+            <AdminDashboard />
           </AdminRoute>
         }
       />
@@ -117,7 +73,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              <Dashboard />
+              {user?.role === "lecturer" ? <LecturerDashboard /> : <StudentDashboard />}
             </Layout>
           </ProtectedRoute>
         }
@@ -152,14 +108,13 @@ const AppRoutes = () => {
 // Main App component
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <div className="app">
       <AuthProvider>
         <Router>
           <AppRoutes />
         </Router>
       </AuthProvider>
-    </ThemeProvider>
+    </div>
   );
 }
 

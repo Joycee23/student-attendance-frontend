@@ -7,12 +7,55 @@ import {
   getRefreshToken,
 } from "../services/api";
 
-const AuthContext = createContext();
+interface User {
+  _id: string;
+  id: string;
+  fullName: string;
+  email: string;
+  role: 'student' | 'lecturer' | 'admin';
+  studentCode?: string;
+  lecturerCode?: string;
+  avatarUrl?: string;
+  classId?: string;
+  courseIds?: any[];
+  dateOfBirth?: string;
+  isActive: boolean;
+  isEmailVerified: boolean;
+  hasFaceRegistered: boolean;
+  faceEncodingId?: string;
+  lastLogin?: string;
+  loginAttempts: number;
+  resetPasswordToken?: string;
+  resetPasswordExpire?: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  classes?: any[];
+}
 
-export const useAuth = () => useContext(AuthContext);
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
+  register: (userData: any) => Promise<{ success: boolean; message: string }>;
+  logout: () => Promise<void>;
+  updateProfile: (profileData: any) => Promise<{ success: boolean; message: string }>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message: string }>;
+}
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -43,10 +86,10 @@ export const AuthProvider = ({ children }) => {
               setIsAuthenticated(true);
             } catch (refreshError) {
               // Refresh failed, clear auth
-              logout();
+              await logout();
             }
           } else {
-            logout();
+            await logout();
           }
         }
       }
@@ -56,9 +99,12 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email: string, password: string) => {
     try {
+      console.log("Login attempt:", { email, password: "***" });
       const response = await authAPI.login({ email, password });
+      console.log("Login API response:", response.data);
+
       const { user: userData, token, refreshToken } = response.data.data;
 
       setAuthToken(token);
@@ -68,16 +114,20 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
       setIsAuthenticated(true);
 
-      return { success: true, user: userData };
-    } catch (error) {
+      return { success: true, message: "Login successful", user: userData };
+    } catch (error: any) {
+      console.error("Login error:", error);
+      console.error("Error response:", error.response);
+      console.error("Error message:", error.response?.data);
+
       return {
         success: false,
-        message: error.response?.data?.message || "Login failed",
+        message: error.response?.data?.message || error.response?.data?.error || error.message || "Login failed",
       };
     }
   };
 
-  const register = async (userData) => {
+  const register = async (userData: any) => {
     try {
       const response = await authAPI.register(userData);
       return {
@@ -86,7 +136,7 @@ export const AuthProvider = ({ children }) => {
           response.data?.message ||
           "Registration successful! Please verify your email.",
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error.response?.data);
       return {
         success: false,
@@ -115,14 +165,14 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  const updateProfile = async (profileData) => {
+  const updateProfile = async (profileData: any) => {
     try {
       const response = await authAPI.updateProfile(profileData);
       const updatedUser = response.data.data.user;
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
       return { success: true, message: "Profile updated successfully" };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: error.response?.data?.message || "Profile update failed",
@@ -130,11 +180,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const changePassword = async (currentPassword, newPassword) => {
+  const changePassword = async (currentPassword: string, newPassword: string) => {
     try {
       await authAPI.changePassword({ currentPassword, newPassword });
       return { success: true, message: "Password changed successfully" };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: error.response?.data?.message || "Password change failed",
@@ -142,7 +192,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
     loading,
     isAuthenticated,
