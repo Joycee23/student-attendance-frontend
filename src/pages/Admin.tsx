@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { usersAPI, statisticsAPI, settingsAPI, classesAPI } from "../services/api";
+import ClassManagement from "./ClassManagement";
 import "../styles/Admin.css";
 
 const AdminDashboard = () => {
@@ -32,6 +33,14 @@ const AdminDashboard = () => {
   // Edit dialog states
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState({
+    fullName: "",
+    email: "",
+    role: "student",
+    studentCode: "",
+    lecturerCode: "",
+  });
+  const [editLoading, setEditLoading] = useState(false);
 
   const { register, user, logout } = useAuth();
   const navigate = useNavigate();
@@ -257,18 +266,29 @@ const AdminDashboard = () => {
 
   const handleEditUser = (user: any) => {
     setEditingUser(user);
+    setEditFormData({
+      fullName: user.fullName || "",
+      email: user.email || "",
+      role: user.role || "student",
+      studentCode: user.studentCode || "",
+      lecturerCode: user.lecturerCode || "",
+    });
     setEditDialogOpen(true);
   };
 
   const handleDeleteUser = async (userId: any) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
+    const confirmMessage = "Are you sure you want to delete this user?\n\nNote: This action cannot be undone.";
+    if (window.confirm(confirmMessage)) {
       try {
-        await usersAPI.delete(userId);
+        console.log("Deleting user with ID:", userId);
+        const response = await usersAPI.delete(userId);
+        console.log("Delete response:", response);
         fetchUsers(); // Refresh the list
         alert("User deleted successfully!");
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error deleting user:", error);
-        alert("Failed to delete user");
+        const errorMessage = error.response?.data?.message || "Failed to delete user";
+        alert(`Failed to delete user: ${errorMessage}`);
       }
     }
   };
@@ -281,6 +301,59 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error("Error toggling user status:", error);
       alert("Failed to update user status");
+    }
+  };
+
+  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setEditFormData({
+      ...editFormData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEditLoading(true);
+
+    const { fullName, email, role, studentCode, lecturerCode } = editFormData;
+
+    if (!fullName || !email) {
+      alert("Please fill in all required fields");
+      setEditLoading(false);
+      return;
+    }
+
+    if (role === "student" && !studentCode) {
+      alert("Student code is required for students");
+      setEditLoading(false);
+      return;
+    }
+
+    if (role === "lecturer" && !lecturerCode) {
+      alert("Lecturer code is required for lecturers");
+      setEditLoading(false);
+      return;
+    }
+
+    const updateData = {
+      fullName,
+      email,
+      role,
+      ...(role === "student" && { studentCode }),
+      ...(role === "lecturer" && { lecturerCode }),
+    };
+
+    try {
+      await usersAPI.update(editingUser._id || editingUser.id, updateData);
+      setEditDialogOpen(false);
+      setEditingUser(null);
+      fetchUsers(); // Refresh the list
+      alert("User updated successfully!");
+    } catch (error) {
+      console.error("Error updating user:", error);
+      alert("Failed to update user");
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -393,6 +466,17 @@ const AdminDashboard = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
                 </svg>
                 <span>Classes</span>
+              </button>
+            </li>
+            <li>
+              <button
+                className={`menu-item ${activeTab === 5 ? 'active' : ''}`}
+                onClick={() => handleTabChange(5)}
+              >
+                <svg className="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <span>Class Management</span>
               </button>
             </li>
             <li>
@@ -668,7 +752,19 @@ const AdminDashboard = () => {
             <div className="content-card">
               <h2 className="section-title">User Management</h2>
               {loadingUsers ? (
-                <div className="loading">Loading users...</div>
+                <div className="loading-container">
+                  <div className="loading">
+                    <div className="cube">
+                      <div className="face front"></div>
+                      <div className="face back"></div>
+                      <div className="face right"></div>
+                      <div className="face left"></div>
+                      <div className="face top"></div>
+                      <div className="face bottom"></div>
+                    </div>
+                  </div>
+                  <p>Loading users...</p>
+                </div>
               ) : (
                 <div className="table-container">
                   <table className="data-table">
@@ -744,7 +840,19 @@ const AdminDashboard = () => {
             <div className="content-card">
               <h2 className="section-title">Class Management</h2>
               {loadingClasses ? (
-                <div className="loading">Loading classes...</div>
+                <div className="loading-container">
+                  <div className="loading">
+                    <div className="cube">
+                      <div className="face front"></div>
+                      <div className="face back"></div>
+                      <div className="face right"></div>
+                      <div className="face left"></div>
+                      <div className="face top"></div>
+                      <div className="face bottom"></div>
+                    </div>
+                  </div>
+                  <p>Loading classes...</p>
+                </div>
               ) : (
                 <div className="table-container">
                   <table className="data-table">
@@ -805,6 +913,11 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {/* Class Management Tab */}
+        {activeTab === 5 && (
+          <ClassManagement />
+        )}
+
         {/* Settings Tab */}
         {activeTab === 3 && (
           <div className="content-section">
@@ -813,6 +926,112 @@ const AdminDashboard = () => {
               <p className="section-subtitle">
                 System settings and configuration will be implemented here.
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Edit User Modal */}
+        {editDialogOpen && editingUser && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h3 className="modal-title">Edit User</h3>
+                <button
+                  className="modal-close"
+                  onClick={() => setEditDialogOpen(false)}
+                >
+                  ✕
+                </button>
+              </div>
+              <form onSubmit={handleUpdateUser} className="modal-body">
+                <div className="form-group">
+                  <label className="form-label">Role</label>
+                  <select
+                    name="role"
+                    value={editFormData.role}
+                    onChange={handleEditFormChange}
+                    required
+                    className="form-select"
+                  >
+                    <option value="student">Student</option>
+                    <option value="lecturer">Lecturer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Full Name</label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    required
+                    className="form-input"
+                    placeholder="Full Name"
+                    value={editFormData.fullName}
+                    onChange={handleEditFormChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Email Address</label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    className="form-input"
+                    placeholder="Email Address"
+                    value={editFormData.email}
+                    onChange={handleEditFormChange}
+                  />
+                </div>
+
+                {editFormData.role === "student" && (
+                  <div className="form-group">
+                    <label className="form-label">Student Code</label>
+                    <input
+                      type="text"
+                      name="studentCode"
+                      required
+                      className="form-input"
+                      placeholder="Student Code"
+                      value={editFormData.studentCode}
+                      onChange={handleEditFormChange}
+                    />
+                  </div>
+                )}
+
+                {editFormData.role === "lecturer" && (
+                  <div className="form-group">
+                    <label className="form-label">Lecturer Code</label>
+                    <input
+                      type="text"
+                      name="lecturerCode"
+                      required
+                      className="form-input"
+                      placeholder="Lecturer Code"
+                      value={editFormData.lecturerCode}
+                      onChange={handleEditFormChange}
+                    />
+                  </div>
+                )}
+
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => setEditDialogOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    disabled={editLoading}
+                  >
+                    {editLoading ? "Updating..." : "Update User"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

@@ -1,0 +1,159 @@
+.class-management {
+  padding: 20px;
+}
+
+.tab-navigation {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  border: none;
+  background: none;
+  color: #6b7280;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab-button.active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
+.tab-button:hover {
+  color: #3b82f6;
+}
+
+.assignment-section {
+  margin-top: 20px;
+}
+
+.assignment-section h3 {
+  margin-bottom: 20px;
+  color: #1f2937;
+  font-size: 1.2rem;
+}
+
+.students-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.student-item {
+  margin-bottom: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.checkbox-label:hover {
+  background-color: #f3f4f6;
+}
+
+.student-info {
+  flex: 1;
+  font-size: 14px;
+}
+
+.selection-count {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 3D Cube Loading Animation */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: #718096;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.spinner-3d {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  perspective: 1000px;
+}
+
+.cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: rotateCube 2s infinite ease-in-out;
+}
+
+.face {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 2px solid #fff;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.face.front {
+  transform: translateZ(40px);
+}
+
+.face.back {
+  transform: translateZ(-40px) rotateY(180deg);
+}
+
+.face.right {
+  transform: rotateY(90deg) translateZ(40px);
+}
+
+.face.left {
+  transform: rotateY(-90deg) translateZ(40px);
+}
+
+.face.top {
+  transform: rotateX(90deg) translateZ(40px);
+}
+
+.face.bottom {
+  transform: rotateX(-90deg) translateZ(40px);
+}
+
+@keyframes rotateCube {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  25% {
+    transform: rotateX(90deg) rotateY(90deg);
+  }
+  50% {
+    transform: rotateX(180deg) rotateY(180deg);
+  }
+  75% {
+    transform: rotateX(270deg) rotateY(270deg);
+  }
+  100% {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}

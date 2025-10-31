@@ -200,20 +200,72 @@ body {
 .rounded-lg { border-radius: 8px; }
 .rounded-xl { border-radius: 12px; }
 
-/* Loading spinner */
+/* 3D Cube Loading Animation - Global */
 .loading {
   display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #1976d2;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  perspective: 1000px;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.loading .cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: rotateCube 2s infinite ease-in-out;
+}
+
+.loading .face {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #1976d2;
+  background: rgba(25, 118, 210, 0.1);
+  box-shadow: 0 0 5px rgba(25, 118, 210, 0.3);
+}
+
+.loading .front {
+  transform: translateZ(20px);
+}
+
+.loading .back {
+  transform: translateZ(-20px) rotateY(180deg);
+}
+
+.loading .right {
+  transform: rotateY(90deg) translateZ(20px);
+}
+
+.loading .left {
+  transform: rotateY(-90deg) translateZ(20px);
+}
+
+.loading .top {
+  transform: rotateX(90deg) translateZ(20px);
+}
+
+.loading .bottom {
+  transform: rotateX(-90deg) translateZ(20px);
+}
+
+@keyframes rotateCube {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  25% {
+    transform: rotateX(90deg) rotateY(90deg);
+  }
+  50% {
+    transform: rotateX(180deg) rotateY(180deg);
+  }
+  75% {
+    transform: rotateX(270deg) rotateY(270deg);
+  }
+  100% {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
 }
 
 /* Alert styles */
@@ -251,6 +303,23 @@ body {
 .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
 .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Loading container styles */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  min-height: 200px;
+}
+
+.loading-container p {
+  margin-top: 15px;
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+}
 
 /* Responsive design */
 @media (max-width: 768px) {
