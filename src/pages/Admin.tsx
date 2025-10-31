@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { usersAPI, statisticsAPI, settingsAPI } from "../services/api";
+import { usersAPI, statisticsAPI, settingsAPI, classesAPI } from "../services/api";
 import "../styles/Admin.css";
 
 const AdminDashboard = () => {
@@ -25,6 +25,10 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState<any>(null);
   const [loadingUsers, setLoadingUsers] = useState(false);
 
+  // Class management states
+  const [classes, setClasses] = useState<any[]>([]);
+  const [loadingClasses, setLoadingClasses] = useState(false);
+
   // Edit dialog states
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
@@ -39,6 +43,8 @@ const AdminDashboard = () => {
 
     if (activeTab === 1) {
       fetchUsers();
+    } else if (activeTab === 2) {
+      fetchClasses();
     } else if (activeTab === 4) {
       fetchStats();
     }
@@ -57,9 +63,24 @@ const AdminDashboard = () => {
   const fetchUsers = async () => {
     setLoadingUsers(true);
     try {
+      console.log("Fetching users for management...");
       const response = await usersAPI.getAll({});
       console.log("Users API response:", response.data);
-      const usersData = response.data?.data || [];
+
+      // Use the same extractData helper function for consistency
+      const extractData = (response: any) => {
+        console.log("Users response data structure:", response.data);
+        if (response.data?.data?.users) return response.data.data.users;
+        if (response.data?.users) return response.data.users;
+        if (response.data?.data && Array.isArray(response.data.data)) return response.data.data;
+        if (Array.isArray(response.data)) return response.data;
+        return [];
+      };
+
+      const usersData = extractData(response);
+      console.log("Extracted users data:", usersData);
+      console.log("Users count:", Array.isArray(usersData) ? usersData.length : 0);
+
       setUsers(Array.isArray(usersData) ? usersData : []);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -69,12 +90,94 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchClasses = async () => {
+    setLoadingClasses(true);
+    try {
+      console.log("Fetching classes for management...");
+      const response = await classesAPI.getAll({});
+      console.log("Classes API response:", response.data);
+
+      // Use the same extractData helper function for consistency
+      const extractData = (response: any) => {
+        console.log("Classes response data structure:", response.data);
+        if (response.data?.data?.classes) return response.data.data.classes;
+        if (response.data?.classes) return response.data.classes;
+        if (response.data?.data && Array.isArray(response.data.data)) return response.data.data;
+        if (Array.isArray(response.data)) return response.data;
+        return [];
+      };
+
+      const classesData = extractData(response);
+      console.log("Extracted classes data:", classesData);
+      console.log("Classes count:", Array.isArray(classesData) ? classesData.length : 0);
+
+      setClasses(Array.isArray(classesData) ? classesData : []);
+    } catch (error) {
+      console.error("Error fetching classes:", error);
+      setClasses([]);
+    } finally {
+      setLoadingClasses(false);
+    }
+  };
+
   const fetchStats = async () => {
     try {
-      const response = await statisticsAPI.getOverview();
-      setStats(response.data.data);
+      console.log("Fetching stats...");
+
+      // Helper function to extract data from various response structures
+      const extractData = (response: any) => {
+        console.log("Response data structure:", response.data);
+        if (response.data?.data?.users) return response.data.data.users;
+        if (response.data?.data?.classes) return response.data.data.classes;
+        if (response.data?.users) return response.data.users;
+        if (response.data?.classes) return response.data.classes;
+        if (response.data?.data && Array.isArray(response.data.data)) return response.data.data;
+        if (Array.isArray(response.data)) return response.data;
+        return [];
+      };
+
+      // Fetch total users
+      const usersResponse = await usersAPI.getAll({});
+      console.log("Users API response:", usersResponse);
+      const usersData = extractData(usersResponse);
+      const totalUsers = Array.isArray(usersData) ? usersData.length : 0;
+      const activeUsers = Array.isArray(usersData) ?
+        usersData.filter((user: any) => user.isActive !== false).length : 0;
+      console.log("Total users:", totalUsers, "Active users:", activeUsers);
+
+      // Fetch total classes
+      const classesResponse = await classesAPI.getAll({});
+      console.log("Classes API response:", classesResponse);
+      const classesData = extractData(classesResponse);
+      const totalClasses = Array.isArray(classesData) ? classesData.length : 0;
+      const activeClasses = Array.isArray(classesData) ?
+        classesData.filter((cls: any) => cls.isActive !== false).length : 0;
+      console.log("Total classes:", totalClasses, "Active classes:", activeClasses);
+
+      // Fetch other stats
+      const overviewResponse = await statisticsAPI.getOverview();
+      const overviewData = overviewResponse.data?.data || {};
+      console.log("Overview data:", overviewData);
+
+      const statsData = {
+        ...overviewData,
+        totalUsers,
+        activeUsers,
+        totalClasses,
+        activeClasses,
+      };
+      console.log("Final stats:", statsData);
+      setStats(statsData);
     } catch (error) {
       console.error("Error fetching stats:", error);
+      setStats({
+        totalUsers: 0,
+        activeUsers: 0,
+        totalClasses: 0,
+        activeClasses: 0,
+        todayAttendance: 0,
+        attendanceRate: 0,
+      });
     }
   };
 
@@ -179,6 +282,29 @@ const AdminDashboard = () => {
       console.error("Error toggling user status:", error);
       alert("Failed to update user status");
     }
+  };
+
+  const handleEditClass = (cls: any) => {
+    // TODO: Implement class edit functionality
+    alert("Class edit functionality will be implemented soon");
+  };
+
+  const handleDeleteClass = async (classId: any) => {
+    if (window.confirm("Are you sure you want to delete this class?")) {
+      try {
+        await classesAPI.delete(classId);
+        fetchClasses(); // Refresh the list
+        alert("Class deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting class:", error);
+        alert("Failed to delete class");
+      }
+    }
+  };
+
+  const handleToggleClassStatus = async (classId: any) => {
+    // TODO: Implement class status toggle if API supports it
+    alert("Class status toggle functionality will be implemented soon");
   };
 
   const handleLogout = async () => {
@@ -312,6 +438,7 @@ const AdminDashboard = () => {
                   <div className="stat-info">
                     <h3 className="stat-title">Total Users</h3>
                     <p className="stat-value">{stats?.totalUsers || 0}</p>
+                    <p className="stat-subtitle">Active: {stats?.activeUsers || 0}</p>
                   </div>
                 </div>
               </div>
@@ -319,8 +446,9 @@ const AdminDashboard = () => {
                 <div className="stat-content">
                   <div className="stat-icon">🎓</div>
                   <div className="stat-info">
-                    <h3 className="stat-title">Active Classes</h3>
+                    <h3 className="stat-title">Total Classes</h3>
                     <p className="stat-value">{stats?.totalClasses || 0}</p>
+                    <p className="stat-subtitle">Active: {stats?.activeClasses || 0}</p>
                   </div>
                 </div>
               </div>
@@ -364,7 +492,7 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                       <div className="activity-item">
-                        <div className="activity-avatar">C</div>
+                        <div className="activity-avatar"></div>
                         <div className="activity-content">
                           <p>Class session completed: <span className="activity-highlight">CS101</span></p>
                           <span className="activity-time">4 hours ago</span>
@@ -615,9 +743,64 @@ const AdminDashboard = () => {
           <div className="content-section">
             <div className="content-card">
               <h2 className="section-title">Class Management</h2>
-              <p className="section-subtitle">
-                Class management features will be implemented here.
-              </p>
+              {loadingClasses ? (
+                <div className="loading">Loading classes...</div>
+              ) : (
+                <div className="table-container">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Class Name</th>
+                        <th>Course Code</th>
+                        <th>Lecturer</th>
+                        <th>Status</th>
+                        <th>Students</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {classes.map((cls: any) => (
+                        <tr key={cls._id || cls.id}>
+                          <td>{cls.name || 'Unnamed Class'}</td>
+                          <td>{cls.code || cls.courseCode || 'N/A'}</td>
+                          <td>{cls.lecturerName || cls.lecturer?.fullName || 'N/A'}</td>
+                          <td>
+                            <span className={`status-chip ${cls.isActive !== false ? 'status-active' : 'status-inactive'}`}>
+                              {cls.isActive !== false ? "Active" : "Inactive"}
+                            </span>
+                          </td>
+                          <td>{cls.studentIds?.length || cls.students?.length || 0}</td>
+                          <td>
+                            <div className="action-buttons">
+                              <button
+                                className="btn-icon btn-edit"
+                                onClick={() => handleEditClass(cls)}
+                                title="Edit"
+                              >
+                                ✏️
+                              </button>
+                              <button
+                                className="btn-icon"
+                                onClick={() => handleToggleClassStatus(cls._id || cls.id)}
+                                title={cls.isActive !== false ? "Deactivate" : "Activate"}
+                              >
+                                {cls.isActive !== false ? "🚫" : "✅"}
+                              </button>
+                              <button
+                                className="btn-icon btn-delete"
+                                onClick={() => handleDeleteClass(cls._id || cls.id)}
+                                title="Delete"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}
